@@ -1,15 +1,22 @@
 from bs4 import BeautifulSoup
 import requests
+from csv import writer
 
-url  = "https://www.mwcbarcelona.com/agenda/speakers"
+url  = "https://uxdx.com/usa/2023/speakers"
 page = requests.get(url)
 
-soup = BeautifulSoup(page.content, 'html.parser')
-lists = soup.find_all('div', class_="speaker-card__meta")
+soup = BeautifulSoup(page.content,'html.parser')
+lists = soup.find_all('div', class_="grid grid-cols-2 h-56")
 
-for list in lists:
-    name = list.find('strong', class_="block font-medium text-white").text
-    about = list.find('span', class_="ais-Highlight-nonHighlighted")
-  
-    info = [name, about]
-    print(info)
+with open('speakersUXDS.csv','w',encoding='utf8',newline='') as f:
+    thewriter = writer(f)
+
+    header = ['Name','Title','Company']
+    thewriter.writerow(header)
+    for list in lists:
+        name = list.find('p',class_="text-xl font-bold line-clamp-2").text
+        title = list.find('p',class_="text-md line-clamp-2").text
+        company = getattr(list.find('p',class_="text-md font-medium line-clamp-2"),'text', None)
+
+        info = [name,title,company]
+        thewriter.writerow(info)
